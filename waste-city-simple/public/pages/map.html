@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Map — WasteCity</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <svg width="26" height="26" viewBox="0 0 28 28" fill="none"><rect x="2" y="2" width="24" height="24" rx="6" stroke="currentColor" stroke-width="2"/><path d="M8 20L11 8L14 15L17 11L20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div><div class="sb-logo-name">WasteCity</div><div class="sb-logo-sub">Analytics</div></div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-label">Analytics</div>
+      <a href="/dashboard" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</a>
+      <a href="/map" class="nav-link active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>City Map</a>
+      <a href="/query" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>SQL Query</a>
+      <div class="sb-label">Security</div>
+      <a href="/security" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Crypto Lab</a>
+    </nav>
+    <div class="sb-footer">
+      <div class="user-chip">
+        <div class="u-avatar" id="u-avatar">A</div>
+        <div><div class="u-name" id="u-name">User</div><div class="u-role" id="u-role">role</div></div>
+        <button class="logout-btn" id="logout-btn" title="Logout"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
+      </div>
+    </div>
+  </aside>
+  <header class="topbar">
+    <div class="topbar-l"><span class="topbar-title">City Map</span></div>
+    <div class="topbar-r"><span class="badge bb" id="city-count">Loading…</span></div>
+  </header>
+  <main class="main">
+    <div class="ph">
+      <div><div class="ph-title">Indian Smart Cities</div><div class="ph-sub">Click any marker for waste statistics</div></div>
+    </div>
+    <div id="map"></div>
+  </main>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/auth.js"></script>
+<script>
+  if (!requireAuth()) throw 0;
+  renderUserChip();
+
+  const map = L.map('map', { center: [20.5937, 78.9629], zoom: 5 });
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OpenStreetMap &copy; CARTO', subdomains: 'abcd', maxZoom: 19
+  }).addTo(map);
+
+  const dot = L.divIcon({
+    html: '<div style="width:12px;height:12px;border-radius:50%;background:#4ade80;border:2px solid #22c55e;box-shadow:0 0 8px rgba(74,222,128,.6);"></div>',
+    iconSize: [12,12], iconAnchor: [6,6], className: ''
+  });
+
+  API.cities.list().then(cities => {
+    document.getElementById('city-count').textContent = cities.length + ' cities';
+    cities.filter(c => c.lat && c.lng).forEach(city => {
+      L.marker([city.lat, city.lng], { icon: dot }).addTo(map).on('click', async () => {
+        const s = await API.cities.summary(city.id);
+        L.popup().setLatLng([city.lat, city.lng]).setContent(`
+          <div class="pu-city">${city.name}</div>
+          <div style="color:var(--text-muted);font-size:.75rem;margin-bottom:.4rem;">${city.state}</div>
+          <div class="pu-row">Total waste <span>${(s.total_waste_kg/1000).toFixed(1)}k kg</span></div>
+          <div class="pu-row">Avg daily   <span>${s.avg_daily_waste_kg?.toLocaleString()} kg</span></div>
+          <div class="pu-row">Recycling   <span>${s.recycling_pct ?? 0}%</span></div>
+          <div class="pu-row">Zones       <span>${s.active_zones}</span></div>
+        `).openOn(map);
+      });
+    });
+  });
+</script>
+</body>
+</html>

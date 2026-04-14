@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Crypto Lab — WasteCity</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <svg width="26" height="26" viewBox="0 0 28 28" fill="none"><rect x="2" y="2" width="24" height="24" rx="6" stroke="currentColor" stroke-width="2"/><path d="M8 20L11 8L14 15L17 11L20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div><div class="sb-logo-name">WasteCity</div><div class="sb-logo-sub">Analytics</div></div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-label">Analytics</div>
+      <a href="/dashboard" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</a>
+      <a href="/map" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>City Map</a>
+      <a href="/query" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>SQL Query</a>
+      <div class="sb-label">Security</div>
+      <a href="/security" class="nav-link active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Crypto Lab</a>
+    </nav>
+    <div class="sb-footer">
+      <div class="user-chip">
+        <div class="u-avatar" id="u-avatar">A</div>
+        <div><div class="u-name" id="u-name">User</div><div class="u-role" id="u-role">role</div></div>
+        <button class="logout-btn" id="logout-btn" title="Logout"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
+      </div>
+    </div>
+  </aside>
+  <header class="topbar">
+    <div class="topbar-l"><span class="topbar-title">Crypto Lab</span><span class="badge bb">Network Security</span></div>
+  </header>
+  <main class="main">
+    <div class="ph">
+      <div><div class="ph-title">Cryptography Demo</div><div class="ph-sub">Live AES-256, SHA-256, RSA-2048 running on the Node.js backend</div></div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="aes">AES-256-CBC</button>
+      <button class="tab-btn" data-tab="sha">SHA-256</button>
+      <button class="tab-btn" data-tab="rsa">RSA-2048</button>
+      <button class="tab-btn" data-tab="audit">Audit Log</button>
+    </div>
+
+    <!-- AES -->
+    <div id="tab-aes" class="tab-pane active">
+      <div class="g2">
+        <div class="card">
+          <div class="cp-title">🔐 Encrypt <span class="cp-tag">AES-256-CBC</span></div>
+          <div class="fg"><label class="flabel">Plaintext</label>
+            <textarea id="aes-in" class="finput ftextarea">Zone: North Industrial
+Status: Critical
+Waste collected: 4,250 kg</textarea>
+          </div>
+          <button class="btn btn-primary btn-sm" id="btn-enc">Encrypt →</button>
+          <div class="rbox" id="aes-out">Result appears here…</div>
+        </div>
+        <div class="card">
+          <div class="cp-title">🔓 Decrypt <span class="cp-tag">Auto-filled</span></div>
+          <div class="fg"><label class="flabel">Ciphertext</label>
+            <textarea id="aes-ct" class="finput ftextarea" placeholder="Paste iv:ciphertext here…"></textarea>
+          </div>
+          <button class="btn btn-secondary btn-sm" id="btn-dec">Decrypt →</button>
+          <div class="rbox blue" id="aes-dec">Result appears here…</div>
+        </div>
+      </div>
+      <div class="card mt2">
+        <div class="card-title" style="margin-bottom:.6rem;">How it works in WasteCity</div>
+        <p>AES-256-CBC generates a fresh random 16-byte IV per encryption. The IV is prepended to the ciphertext as <code>iv_hex:encrypted_hex</code> so decryption is self-contained. Zone notes and transcript content are encrypted with this scheme before being stored in SQLite.</p>
+      </div>
+    </div>
+
+    <!-- SHA -->
+    <div id="tab-sha" class="tab-pane">
+      <div class="card">
+        <div class="cp-title">🔑 SHA-256 Hash <span class="cp-tag">One-way</span></div>
+        <div class="fg"><label class="flabel">Input</label>
+          <input id="sha-in" class="finput" type="text" value="Mumbai waste record 2026-04-11 zone-3 waste_kg=1240.5">
+        </div>
+        <button class="btn btn-primary btn-sm" id="btn-sha">Hash →</button>
+        <div class="rbox" id="sha-out">Result appears here…</div>
+      </div>
+      <div class="card mt2">
+        <div class="card-title" style="margin-bottom:.6rem;">How it works in WasteCity</div>
+        <p>Every waste record stores a SHA-256 hash of <code>cityId + zoneId + date + wasteKg</code>. Tampering with any field is detectable by recomputing and comparing the hash. All audit log entries store a SHA-256 hash of the request payload — the raw payload is never written to disk.</p>
+      </div>
+    </div>
+
+    <!-- RSA -->
+    <div id="tab-rsa" class="tab-pane">
+      <div class="card" style="margin-bottom:1.25rem;">
+        <div class="cp-title">🗝️ RSA-2048 Key Pair <span class="cp-tag">Asymmetric</span></div>
+        <button class="btn btn-primary btn-sm" id="btn-rsa-gen">Generate Key Pair</button>
+        <div id="rsa-keys" class="hidden mt2">
+          <div class="fg"><label class="flabel">Public Key (PEM)</label><textarea id="rsa-pub" class="finput ftextarea mono" rows="5" readonly></textarea></div>
+          <div class="fg"><label class="flabel">Private Key (PEM)</label><textarea id="rsa-priv" class="finput ftextarea mono" rows="5" readonly></textarea></div>
+        </div>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div class="cp-title">✍️ Sign</div>
+          <div class="fg"><label class="flabel">Data</label><input id="rsa-data" class="finput" type="text" value="Waste report approved — Mumbai April 2026"></div>
+          <button class="btn btn-secondary btn-sm" id="btn-rsa-sign">Sign →</button>
+          <div class="rbox" id="rsa-sig">Generate keys first…</div>
+        </div>
+        <div class="card">
+          <div class="cp-title">✅ Verify</div>
+          <p class="text-sm" style="margin-bottom:.75rem;">Verifies the signature against the public key and original data.</p>
+          <button class="btn btn-secondary btn-sm" id="btn-rsa-verify">Verify →</button>
+          <div class="rbox blue" id="rsa-vout">Sign data first…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Audit -->
+    <div id="tab-audit" class="tab-pane">
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">Audit Trail</div><div class="card-sub">Payload SHA-256 hashed — raw data never stored</div></div>
+          <button class="btn btn-secondary btn-sm" id="btn-refresh-audit">↻ Refresh</button>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Time</th><th>User</th><th>Action</th><th>Resource</th><th>IP</th><th>Payload Hash</th></tr></thead>
+            <tbody id="audit-body"><tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted);">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/auth.js"></script>
+<script>
+  if (!requireAuth()) throw 0;
+  renderUserChip();
+
+  // Tabs
+  document.querySelectorAll('.tab-btn').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    document.getElementById('tab-' + b.dataset.tab).classList.add('active');
+    if (b.dataset.tab === 'audit') loadAudit();
+  }));
+
+  // AES
+  document.getElementById('btn-enc').addEventListener('click', async () => {
+    try {
+      const r = await API.security.encrypt(document.getElementById('aes-in').value);
+      document.getElementById('aes-out').textContent = r.encrypted;
+      document.getElementById('aes-ct').value = r.encrypted;
+    } catch(e) { document.getElementById('aes-out').textContent = 'Error: ' + e.message; }
+  });
+  document.getElementById('btn-dec').addEventListener('click', async () => {
+    try {
+      const r = await API.security.decrypt(document.getElementById('aes-ct').value);
+      document.getElementById('aes-dec').textContent = r.decrypted;
+    } catch(e) { document.getElementById('aes-dec').textContent = 'Error: ' + e.message; }
+  });
+
+  // SHA
+  document.getElementById('btn-sha').addEventListener('click', async () => {
+    try {
+      const r = await API.security.hash(document.getElementById('sha-in').value);
+      document.getElementById('sha-out').textContent = r.hash + '\n\nAlgorithm: SHA-256  |  Output: 256 bits (64 hex chars)';
+    } catch(e) { document.getElementById('sha-out').textContent = 'Error: ' + e.message; }
+  });
+
+  // RSA
+  let pub = '', priv = '', lastSig = '';
+  document.getElementById('btn-rsa-gen').addEventListener('click', async () => {
+    const btn = document.getElementById('btn-rsa-gen');
+    btn.disabled = true; btn.textContent = 'Generating…';
+    try {
+      const r = await API.security.rsaGenerate();
+      pub = r.publicKey; priv = r.privateKey;
+      document.getElementById('rsa-pub').value  = pub;
+      document.getElementById('rsa-priv').value = priv;
+      document.getElementById('rsa-keys').classList.remove('hidden');
+    } catch(e) { alert(e.message); }
+    btn.disabled = false; btn.textContent = 'Generate Key Pair';
+  });
+  document.getElementById('btn-rsa-sign').addEventListener('click', async () => {
+    if (!priv) { alert('Generate a key pair first.'); return; }
+    try {
+      const r = await API.security.rsaSign(priv, document.getElementById('rsa-data').value);
+      lastSig = r.signature;
+      document.getElementById('rsa-sig').textContent = r.signature;
+    } catch(e) { document.getElementById('rsa-sig').textContent = 'Error: ' + e.message; }
+  });
+  document.getElementById('btn-rsa-verify').addEventListener('click', async () => {
+    if (!pub || !lastSig) { alert('Generate keys and sign first.'); return; }
+    try {
+      const r = await API.security.rsaVerify(pub, document.getElementById('rsa-data').value, lastSig);
+      const el = document.getElementById('rsa-vout');
+      el.textContent = r.valid ? '✅  VALID — signature matches. Data is authentic.' : '❌  INVALID — signature mismatch.';
+      el.style.color = r.valid ? 'var(--primary)' : 'var(--danger)';
+    } catch(e) { document.getElementById('rsa-vout').textContent = 'Error: ' + e.message; }
+  });
+
+  // Audit
+  async function loadAudit() {
+    const tb = document.getElementById('audit-body');
+    tb.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:1.5rem;color:var(--text-muted);">Loading…</td></tr>';
+    try {
+      const logs = await API.security.auditLogs();
+      if (!logs.length) { tb.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:1.5rem;color:var(--text-muted);">No logs yet</td></tr>'; return; }
+      tb.innerHTML = logs.map(l => `<tr>
+        <td class="mono text-xs">${(l.created_at||'').replace('T',' ').split('.')[0]}</td>
+        <td><span class="badge bb">${l.username||'system'}</span></td>
+        <td><span class="badge bg">${l.action}</span></td>
+        <td class="text-muted">${l.resource}</td>
+        <td class="mono text-xs">${l.ip_address||'—'}</td>
+        <td class="mono text-xs truncate" style="max-width:160px;" title="${l.payload_hash}">${(l.payload_hash||'').slice(0,16)}…</td>
+      </tr>`).join('');
+    } catch(e) { tb.innerHTML = `<tr><td colspan="6" style="color:var(--danger);padding:1rem;">${e.message}</td></tr>`; }
+  }
+  document.getElementById('btn-refresh-audit').addEventListener('click', loadAudit);
+</script>
+</body>
+</html>

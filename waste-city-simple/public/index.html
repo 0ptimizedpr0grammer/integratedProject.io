@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>WasteCity — Sign In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+<div class="login-wrap">
+  <div class="login-box">
+    <div class="login-logo">
+      <svg width="34" height="34" viewBox="0 0 28 28" fill="none">
+        <rect x="2" y="2" width="24" height="24" rx="6" stroke="currentColor" stroke-width="2"/>
+        <path d="M8 20L11 8L14 15L17 11L20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="login-logo-name">WasteCity</span>
+    </div>
+    <h2 style="margin-bottom:.25rem;">Welcome back</h2>
+    <p class="text-sm" style="margin-bottom:1.5rem;">Sign in to the analytics platform</p>
+
+    <div id="lerr" class="alert alert-err hidden"></div>
+
+    <form id="login-form">
+      <div class="fg">
+        <label class="flabel" for="un">Username</label>
+        <input id="un" class="finput" type="text" placeholder="admin" autocomplete="username" required>
+      </div>
+      <div class="fg">
+        <label class="flabel" for="pw">Password</label>
+        <input id="pw" class="finput" type="password" placeholder="••••••••" autocomplete="current-password" required>
+      </div>
+      <button id="lbtn" class="btn btn-primary w-full" type="submit" style="justify-content:center;margin-top:.25rem;">Sign In</button>
+    </form>
+
+    <p class="text-xs text-muted" style="margin-top:1.25rem;text-align:center;">
+      Demo &nbsp;→&nbsp; <code>admin / admin123</code> &nbsp;or&nbsp; <code>analyst / analyst123</code>
+    </p>
+  </div>
+</div>
+<script src="/js/api.js"></script>
+<script src="/js/auth.js"></script>
+</body>
+</html>

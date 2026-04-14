@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SQL Query — WasteCity</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <svg width="26" height="26" viewBox="0 0 28 28" fill="none"><rect x="2" y="2" width="24" height="24" rx="6" stroke="currentColor" stroke-width="2"/><path d="M8 20L11 8L14 15L17 11L20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div><div class="sb-logo-name">WasteCity</div><div class="sb-logo-sub">Analytics</div></div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-label">Analytics</div>
+      <a href="/dashboard" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</a>
+      <a href="/map" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>City Map</a>
+      <a href="/query" class="nav-link active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>SQL Query</a>
+      <div class="sb-label">Security</div>
+      <a href="/security" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Crypto Lab</a>
+    </nav>
+    <div class="sb-footer">
+      <div class="user-chip">
+        <div class="u-avatar" id="u-avatar">A</div>
+        <div><div class="u-name" id="u-name">User</div><div class="u-role" id="u-role">role</div></div>
+        <button class="logout-btn" id="logout-btn" title="Logout"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
+      </div>
+    </div>
+  </aside>
+  <header class="topbar">
+    <div class="topbar-l"><span class="topbar-title">SQL Query</span><span class="badge by">SELECT only</span></div>
+    <div class="topbar-r"><span id="run-meta" class="text-xs text-muted"></span></div>
+  </header>
+  <main class="main">
+    <div class="ph">
+      <div><div class="ph-title">Query Browser</div><div class="ph-sub">Run live SELECT queries — Ctrl+Enter to execute</div></div>
+    </div>
+
+    <div class="card" style="margin-bottom:1.25rem;">
+      <div class="card-header">
+        <div class="card-title">Editor</div>
+        <button class="btn btn-primary btn-sm" id="btn-run">▶ Run</button>
+      </div>
+      <textarea id="sql-ed" class="finput ftextarea sql-ta" rows="5" spellcheck="false">SELECT c.name, c.state,
+       COUNT(wr.id)               AS records,
+       ROUND(SUM(wr.waste_kg),2)  AS total_waste_kg,
+       ROUND(AVG(wr.waste_kg),2)  AS avg_waste_kg,
+       ROUND(SUM(wr.recycled_kg)*100.0/SUM(wr.waste_kg),1) AS recycling_pct
+FROM cities c
+JOIN waste_records wr ON wr.city_id = c.id
+GROUP BY c.id
+ORDER BY total_waste_kg DESC;</textarea>
+      <div id="qerr" class="alert alert-err hidden" style="margin-top:.75rem;margin-bottom:0;"></div>
+      <div style="margin-top:.9rem;">
+        <div class="text-xs text-muted" style="margin-bottom:.4rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;">Quick Queries</div>
+        <div style="display:flex;flex-wrap:wrap;gap:.4rem;" id="quick-btns"></div>
+      </div>
+    </div>
+
+    <div class="card" id="res-card" style="display:none;">
+      <div class="card-header">
+        <div class="card-title">Results</div>
+        <span id="res-meta" class="text-xs text-muted"></span>
+      </div>
+      <div class="tbl-wrap" id="res-table"></div>
+    </div>
+
+    <div class="card mt2">
+      <div class="card-header"><div class="card-title">Schema</div></div>
+      <div class="g2" style="gap:.75rem;font-size:.82rem;">
+        <div>
+          <div style="color:var(--accent);font-weight:700;margin-bottom:.3rem;">cities</div>
+          <code>id, name, state, population, lat, lng, tier</code>
+          <div style="color:var(--accent);font-weight:700;margin:.6rem 0 .3rem;">waste_zones</div>
+          <code>id, city_id, name, area_sq_km, waste_type</code>
+        </div>
+        <div>
+          <div style="color:var(--accent);font-weight:700;margin-bottom:.3rem;">waste_records</div>
+          <code>id, city_id, zone_id, recorded_date, waste_kg, recycled_kg, waste_type, integrity_hash</code>
+          <div style="color:var(--accent);font-weight:700;margin:.6rem 0 .3rem;">audit_logs</div>
+          <code>id, user_id, action, resource, ip_address, payload_hash, created_at</code>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/auth.js"></script>
+<script>
+  if (!requireAuth()) throw 0;
+  renderUserChip();
+
+  const QUICK = [
+    { label: 'All Cities',      sql: 'SELECT * FROM cities ORDER BY name;' },
+    { label: 'Top Zones',       sql: 'SELECT wz.name, c.name as city, ROUND(SUM(wr.waste_kg),2) as total_kg\nFROM waste_zones wz\nJOIN cities c ON c.id=wz.city_id\nJOIN waste_records wr ON wr.zone_id=wz.id\nGROUP BY wz.id ORDER BY total_kg DESC LIMIT 10;' },
+    { label: 'Daily Trend',     sql: 'SELECT recorded_date, ROUND(SUM(waste_kg),2) as kg\nFROM waste_records WHERE city_id=1\nGROUP BY recorded_date ORDER BY recorded_date DESC LIMIT 30;' },
+    { label: 'Recycling Rates', sql: "SELECT c.name, ROUND(SUM(wr.recycled_kg)*100.0/SUM(wr.waste_kg),1) as pct\nFROM cities c JOIN waste_records wr ON wr.city_id=c.id\nGROUP BY c.id ORDER BY pct DESC;" },
+    { label: 'Audit Logs',      sql: 'SELECT al.created_at, u.username, al.action, al.resource, al.ip_address\nFROM audit_logs al LEFT JOIN users u ON al.user_id=u.id\nORDER BY al.created_at DESC LIMIT 20;' },
+  ];
+
+  const qb = document.getElementById('quick-btns');
+  QUICK.forEach(q => {
+    const b = document.createElement('button');
+    b.className = 'btn btn-secondary btn-sm';
+    b.textContent = q.label;
+    b.addEventListener('click', () => { document.getElementById('sql-ed').value = q.sql; run(); });
+    qb.appendChild(b);
+  });
+
+  document.getElementById('btn-run').addEventListener('click', run);
+  document.getElementById('sql-ed').addEventListener('keydown', e => { if ((e.ctrlKey||e.metaKey) && e.key==='Enter') run(); });
+
+  async function run() {
+    const sql   = document.getElementById('sql-ed').value.trim();
+    const errEl = document.getElementById('qerr');
+    const meta  = document.getElementById('run-meta');
+    errEl.classList.add('hidden');
+    meta.textContent = 'Running…';
+    try {
+      const d = await API.query(sql);
+      meta.textContent = d.rowCount + ' rows · ' + d.executionTimeMs + 'ms' + (d.truncated ? ' · capped at 500' : '');
+      document.getElementById('res-meta').textContent = d.columns.length + ' columns';
+      document.getElementById('res-card').style.display = 'block';
+      const thead = '<thead><tr>' + d.columns.map(c => `<th>${c}</th>`).join('') + '</tr></thead>';
+      const tbody = '<tbody>' + d.rows.map(row =>
+        '<tr>' + row.map(v => `<td>${v === null ? '<span style="color:var(--text-faint)">null</span>' : v}</td>`).join('') + '</tr>'
+      ).join('') + '</tbody>';
+      document.getElementById('res-table').innerHTML = '<table>' + thead + tbody + '</table>';
+    } catch(e) {
+      meta.textContent = '';
+      errEl.textContent = e.message;
+      errEl.classList.remove('hidden');
+      document.getElementById('res-card').style.display = 'none';
+    }
+  }
+</script>
+</body>
+</html>
